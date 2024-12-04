@@ -1,4 +1,4 @@
-# Project Creating WebServer Using C and WebSocket
+# Project Creating WebServer Using C 
 
 ## Authors
 - Muhammad Adhyaksa Fadillah (NIM: 231524051)
