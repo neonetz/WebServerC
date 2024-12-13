@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Iinclude
-DEPS = HTTP_Server.h Routes.h Response.h Logger.h ClientHandler.h
+DEPS = HTTP_Server.h Routes.h Response.h Logger.h ClientHandler.h SignalHandler.h Server.h
 exec = server.o
 sources = $(wildcard src/*.c)
 objects = $(sources:.c=.o)
