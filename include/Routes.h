@@ -1,3 +1,6 @@
+#ifndef ROUTES_H
+#define ROUTES_H
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,3 +21,5 @@ struct Route * search(struct Route * root, char * key);
 
 
 void inorder(struct Route * root );
+
+#endif // ROUTES_H
