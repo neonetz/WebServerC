@@ -23,19 +23,20 @@ void inorder(struct Route* root)
     }
 }
 
-struct Route * addRoute(struct Route * root, char* key, char* value) {
-	if (root == NULL) {
-		return initRoute(key, value);
-	}
+struct Route *addRoute(struct Route *root, char* key, char* value) {
+    if (root == NULL) {
+        return initRoute(key, value);
+    }
 
-	if (strcmp(key, root->key) == 0) {
-		printf("============ WARNING ============\n");
-		printf("A Route For \"%s\" Already Exists\n", key);
-	}else if (strcmp(key, root->key) > 0) {
-		root->right = addRoute(root->right, key, value);
-	}else {
-		root->left = addRoute(root->left, key, value);
-	}
+    if (strcmp(key, root->key) == 0) {
+        printf("============ WARNING ============\n");
+        printf("A Route For \"%s\" Already Exists\n", key);
+    } else if (strcmp(key, root->key) > 0) {
+        root->right = addRoute(root->right, key, value);
+    } else {
+        root->left = addRoute(root->left, key, value);
+    }
+    return root; // Pastikan untuk mengembalikan root
 }
 
 struct Route * search(struct Route * root, char* key) {
@@ -53,3 +54,9 @@ struct Route * search(struct Route * root, char* key) {
 
 }
 
+struct Route *initialize_routes() {
+    struct Route *root = NULL;
+    root = addRoute(root, "/", "index.html");
+    root = addRoute(root, "/about", "about.html");
+    return root;
+}
