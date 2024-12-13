@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <netinet/in.h>
 
 void start_server(int port) {
@@ -19,16 +20,20 @@ void start_server(int port) {
     printf("Server is listening on port %d...\n", http_server.port);
 
     while (1) {
+
+        pid_t pid = getpid();
         int client_socket = accept(http_server.socket, NULL, NULL);
         if (client_socket < 0) {
             perror("Failed to accept connection");
             continue;
+        }else{
+            pid = fork();
         }
 
-        pid_t pid = fork();
         if (pid < 0) {
             perror("Failed to fork");
             close(client_socket);
+            exit(EXIT_FAILURE);
             continue;
         }
 
@@ -36,12 +41,16 @@ void start_server(int port) {
             // Proses anak
             close(http_server.socket); // Tutup socket server di proses anak
             handle_client(client_socket, route);
-            exit(0); // Keluar dari proses anak setelah menangani klien
+            exit(EXIT_SUCCESS); // Keluar dari proses anak setelah menangani klien
         } else {
             // Proses induk
+            int status;
+            if (waitpid(pid, &status, WNOHANG) < 0)
+            {
+                pid = fork();
+            }
             close(client_socket); // Tutup socket klien di proses induk
         }
     }
-
     close(http_server.socket);
 }
