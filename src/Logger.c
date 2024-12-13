@@ -21,3 +21,21 @@ void log_request(const char *method, const char *url)
         perror("Failed to open log file");
     }
 }
+
+void log_fork(const char * message, int pid){
+    FILE *log_file = fopen("serverFork.log", "a");
+    if (log_file != NULL)
+    {
+        time_t now = time(NULL);
+        struct tm *tm_info = localtime(&now);
+        char time_str[26];
+        strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", tm_info); // Format timestamp
+
+        fprintf(log_file, "[%s] Fork Activity : %s, PID: %d\n", time_str, message, pid);
+        fclose(log_file);
+    }
+    else
+    {
+        perror("Failed to open log file");
+    }
+}

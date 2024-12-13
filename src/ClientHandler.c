@@ -16,7 +16,16 @@ void handle_client(int client_socket, struct Route *route) {
         perror("Failed to read from client");
         close(client_socket);
         return;
-    }
+    }else if (bytes_read > MAX_CLIENT_MSG_SIZE)
+    {
+            printf("Request terlalu besar, menolak permintaan.\n");
+            send(client_socket, "HTTP/1.1 413 Payload Too Large\r\n\r\n", 35, 0); // 413 status code
+            close(client_socket);
+    }else
+        {
+            printf("%s\n", client_msg);
+        }
+    
     
     client_msg[bytes_read] = '\0'; // Null-terminate the string
     printf("Received message: %s\n", client_msg);

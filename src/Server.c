@@ -1,6 +1,7 @@
 #include "HTTP_Server.h"
 #include "Routes.h"
 #include "ClientHandler.h"
+#include "Logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -28,6 +29,7 @@ void start_server(int port) {
             continue;
         }else{
             pid = fork();
+            log_fork("[00]client fork", pid);
         }
 
         if (pid < 0) {
@@ -39,6 +41,7 @@ void start_server(int port) {
 
         if (pid == 0) {
             // Proses anak
+            log_fork("[00]client fork", getpid());
             close(http_server.socket); // Tutup socket server di proses anak
             handle_client(client_socket, route);
             exit(EXIT_SUCCESS); // Keluar dari proses anak setelah menangani klien
@@ -47,7 +50,14 @@ void start_server(int port) {
             int status;
             if (waitpid(pid, &status, WNOHANG) < 0)
             {
+                log_fork("[01]terminate fork", pid);
                 pid = fork();
+                if (pid == 0)
+                {
+                    log_fork("[02]replace fork", getpid());
+                    /* code */
+                }
+                
             }
             close(client_socket); // Tutup socket klien di proses induk
         }
