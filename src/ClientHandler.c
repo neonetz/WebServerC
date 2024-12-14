@@ -55,16 +55,40 @@ void handle_client(int client_socket, struct Route *route) {
         } else {
             send_response(client_socket, "No Body Found", 400);
         }
-    } else if (strcmp(method, "PUT") == 0) {
-        // Handle PUT request (add route)
-        char *body = strstr(client_msg, "\r\n\r\n");
-        if (body) {
-            body += 4;
-            route = addRoute(route, urlRoute, body);
-            send_response(client_socket, "Route added successfully.", 200);
-        } else {
-            send_response(client_socket, "No data to add route.", 400);
+    } // Menangani PUT request untuk route baru
+else if (strcmp(method, "PUT") == 0) {
+    // Handle PUT request (add route)
+    char *body = strstr(client_msg, "\r\n\r\n");
+    if (body) {
+        body += 4; // Skip header terminator
+
+        // Menyusun path file dengan ekstensi yang sesuai
+        char file_path[256] = "templates/";  // Folder templates, sesuaikan jika perlu
+        strcat(file_path, urlRoute + 1);     // Menambahkan URL route tanpa tanda "/"
+        
+        // Jika file tidak memiliki ekstensi, tambahkan .html secara default
+        if (strrchr(file_path, '.') == NULL) {
+            strcat(file_path, ".html");
         }
+
+        // Membuka file untuk menulis (akan membuat file baru jika tidak ada)
+        FILE *file = fopen(file_path, "w");
+        if (file) {
+            // Menulis body dari request ke file
+            fwrite(body, sizeof(char), strlen(body), file);
+            fclose(file); // Menutup file setelah selesai
+
+            // Menambahkan route ke pohon
+            route = addRoute(route, urlRoute, file_path);  // Menyimpan path file di route
+
+            send_response(client_socket, "Route added successfully and file created.", 200);
+        } else {
+            // Error saat membuka file
+            send_response(client_socket, "Error creating file.", 500);
+        }
+    } else {
+        send_response(client_socket, "No data to add route.", 400);
+    }
     } else if (strcmp(method, "DELETE") == 0) {
         // Handle DELETE request
         struct Route *deleted = deleteRoute(route, urlRoute);
