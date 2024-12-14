@@ -98,21 +98,22 @@ else if (strcmp(method, "PUT") == 0) {
             send_response(client_socket, "Route not found.", 404);
         }
     } else if (strcmp(method, "PATCH") == 0) {
-        // Handle PATCH request (update route)
-        char *body = strstr(client_msg, "\r\n\r\n");
-        if (body) {
-            body += 4;
-            struct Route *existing = search(route, urlRoute);
-            if (existing) {
-                existing->value = body; // Replace value
-                send_response(client_socket, "Route updated successfully.", 200);
-            } else {
-                send_response(client_socket, "Route not found.", 404);
-            }
+    // Handle PATCH request (update route)
+    char *body = strstr(client_msg, "\r\n\r\n");
+    if (body) {
+        body += 4; // Skip header terminator
+        struct Route *existing = search(route, urlRoute);
+        if (existing) {
+            // Update the route value with the new content
+            existing->value = body; // Replace value with new content
+            send_response(client_socket, "Route updated successfully.", 200);
         } else {
-            send_response(client_socket, "No data to update route.", 400);
+            send_response(client_socket, "Route not found.", 404);
         }
     } else {
+        send_response(client_socket, "No data to update route.", 400);
+    }
+} else {
         // Unknown method
         send_response(client_socket, "Method Not Allowed", 405);
     }
