@@ -1,6 +1,6 @@
 # WebServerC
 
-![WebServerC](https://img.shields.io/badge/Language-C-blue.svg) ![Status](https://img.shields.io/badge/Status-Development-yellow.svg) ![License]
+![WebServerC](https://img.shields.io/badge/Language-C-blue.svg) ![Status](https://img.shields.io/badge/Status-Development-yellow.svg) 
 
 ## Project Description
 **WebServerC** is a simple project to build a web server using the C programming language. This server is designed to efficiently handle HTTP requests and provide appropriate responses. It is ideal for beginners who want to learn:
