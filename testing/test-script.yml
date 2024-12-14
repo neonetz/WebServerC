@@ -9,7 +9,7 @@
 #       - get:
 #           url: "/"
 config:
-  target: 'http://74.226.204.119:8080/'
+  target: 'http://localhost:8080/'
   phases:
     - duration: 30
       arrivalRate: 10

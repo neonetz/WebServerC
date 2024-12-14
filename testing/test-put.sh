@@ -1,6 +1,6 @@
 #!/bin/bash
 
-URL="http://localhost:8080/newroute"
+URL="http://localhost:8080/aisNigga"
 DATA="Updated Conentt"
 
 response=$(curl -s -o /dev/null -w "%{http_code}" -X PUT --data "$DATA" $URL)

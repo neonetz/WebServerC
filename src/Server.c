@@ -83,7 +83,7 @@ void start_server(int port) {
                 if (pid == 0)
                 {
                     log_fork("[02]replace fork", getpid());
-                    /* code */
+                    
                 }
                 
             }

@@ -1,18 +1,25 @@
 # WebServerC
 
-## Deskripsi Proyek
+![WebServerC](https://img.shields.io/badge/Language-C-blue.svg) ![Status](https://img.shields.io/badge/Status-Development-yellow.svg) ![License]
 
-WebServerC adalah proyek yang bertujuan untuk membuat server web sederhana menggunakan bahasa pemrograman C. Proyek ini menunjukkan cara mengatur server web dasar yang dapat menangani permintaan HTTP dan memberikan respons yang sesuai. Server ini dirancang untuk mendemonstrasikan konsep dasar pemrograman jaringan, pengelolaan proses, dan penanganan sinyal di C.
+## Project Description
+**WebServerC** is a simple project to build a web server using the C programming language. This server is designed to efficiently handle HTTP requests and provide appropriate responses. It is ideal for beginners who want to learn:
 
-## Fitur Utama
+- 🌐 Network programming using sockets.
+- 🧵 Process management with fork.
+- 📡 Signal handling in operating systems.
 
-- Menangani permintaan HTTP GET dan POST.
-- Menolak permintaan yang melebihi batas ukuran yang ditentukan dengan kode status HTTP 413 (Payload Too Large).
-- Mengelola rute untuk mengarahkan permintaan ke file statis atau halaman HTML.
-- Menggunakan proses anak untuk menangani beberapa klien secara bersamaan.
-- Menyediakan logging untuk permintaan dan fork proses.
+## Key Features
 
-## Struktur Proyek
+- **HTTP Support:** Handles HTTP GET and POST requests.
+- **Request Size Limit:** ❌ Rejects oversized requests with **413 Payload Too Large** status.
+- **Route Management:** 📂 Directs requests to static files or HTML pages.
+- **Parallel Processing:** ♻️ Utilizes child processes to serve multiple clients simultaneously.
+- **Logging:** 📝 Logs requests and fork operations.
+
+---
+
+## Project Structure
 
 ```plaintext
 WebServerC/
@@ -23,13 +30,14 @@ WebServerC/
 │   ├── Logger.c
 │   ├── main.c
 │   ├── Response.c
-│   |── Routes.c
-|   |── Server.c
-|   └── SignalHandler.c
-|
+│   ├── Routes.c
+│   ├── Server.c
+│   └── SignalHandler.c
+│
 ├── testing/
 │   ├── test-buffer-limit.sh
 │   └── test-buffer-overflow.sh
+│
 └── include/
     ├── ClientHandler.h
     ├── HTTP_Server.h
@@ -37,81 +45,131 @@ WebServerC/
     ├── Response.h
     ├── Routes.h
     ├── Server.h
-    └── SignalHanler.h
+    └── SignalHandler.h
 ```
 
-## Instalasi
+---
 
-### Clone Repository
+## Installation
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/username/WebServerC.git
+git clone https://github.com/neonetz/WebServerC.git
 cd WebServerC
 ```
 
-### Kompilasi Kode
+### 2. Compile the Code
+
+Use `make` to compile all source code:
 
 ```bash
 make
 ```
 
-### Jalankan Server
+### 3. Run the Server
+
+After successful compilation, start the server with the following command:
 
 ```bash
 ./server.o
 ```
 
-## Penggunaan
+🚀 The server will run on **port 8080** by default.
 
-Setelah server berjalan, Anda dapat mengirimkan permintaan HTTP menggunakan alat seperti `curl` atau browser web. Contoh permintaan menggunakan `curl`:
+---
+
+## Usage
+
+Once the server is running, you can send HTTP requests using tools like `curl` or a web browser. Example:
 
 ```bash
 curl http://localhost:8080
 ```
 
-### Menguji Batas Ukuran Permintaan
+### Testing Request Size Limit
 
-Untuk menguji batas ukuran permintaan, Anda dapat menjalankan skrip berikut:
+To test the request size limit, execute the following script:
 
 ```bash
 bash testing/test-buffer-limit.sh
 ```
 
-### Menguji Buffer Overflow
+### Testing Buffer Overflow
 
-Untuk menguji potensi buffer overflow, jalankan:
+To test potential buffer overflow, use the following script:
 
 ```bash
 bash testing/test-buffer-overflow.sh
 ```
 
-## Penjelasan Fungsi Utama
+---
+### Testing HTTP Methods
+
+To test different HTTP methods, use the following scripts:
+
+- **GET Request:**
+  ```bash
+  bash testing/test-get.sh
+  ```
+
+- **POST Request:**
+  ```bash
+  bash testing/test-post.sh
+  ```
+
+- **PUT Request:**
+  ```bash
+  bash testing/test-put.sh
+  ```
+
+- **PATCH Request:**
+  ```bash
+  bash testing/test-patch.sh
+  ```
+
+- **DELETE Request:**
+  ```bash
+  bash testing/test-delete.sh
+  ```
+
+---
+
+## Key Functions Explanation
 
 ### `start_server(int port)`
-
-Fungsi ini menginisialisasi server dan mulai mendengarkan permintaan pada port yang ditentukan. Ini juga mengatur rute dan menangani klien yang terhubung.
+- ⚙️ Initializes the server and starts listening for requests on a specified port.
+- 🛠️ Sets up routes and handles client connections.
 
 ### `handle_client(int client_socket, struct Route *route)`
+- 📞 Handles communication with the client.
+- ✅ Reads messages, validates requests, and sends appropriate responses.
+- 🚫 Returns **413** status if the request size exceeds the limit.
+- 🗂️ Handles different HTTP methods (GET, POST, PUT, DELETE, PATCH).
 
-Fungsi ini bertanggung jawab untuk menangani komunikasi dengan klien. Ini membaca pesan dari klien, memeriksa apakah permintaan valid, dan mengirimkan respons yang sesuai. Jika ukuran permintaan melebihi batas, server akan mengirimkan kode status 413.
-
-### `init_server(HTTP_Server * http_server, int port)`
-
-Fungsi ini menginisialisasi socket server dan mengikatnya ke alamat dan port yang ditentukan. Ini juga mempersiapkan server untuk mendengarkan permintaan masuk.
+### `init_server(HTTP_Server *http_server, int port)`
+- 🖧 Initializes the server socket, binds it to the port, and prepares the server to listen for incoming connections.
 
 ### `sigchld_handler(int signo)`
+- 🧹 Handles the SIGCHLD signal to clean up finished child processes.
+- 🛡️ Prevents zombie processes.
 
-Fungsi ini menangani sinyal SIGCHLD untuk membersihkan proses anak yang telah selesai, mencegah terjadinya zombie process.
+---
 
-## Lisensi
+## Contributors
 
-## Author
+| Name                       | ID Number  |
+|----------------------------|------------|
+| Muhammad Adhyaksa Fadillah | 231524051  |
+| Ais Laksana                | 231524035  |
 
-- Muhammad Adhyaksa Fadillah (NIM: 231524051)
-- Ais Laksana (NIM: 231524035)
+---
 
-## Kontak
+## Contact
 
-Jika Anda memiliki pertanyaan atau saran, silakan hubungi kami melalui email atau melalui platform pengembangan yang Anda gunakan.
+If you have any questions or suggestions, feel free to contact us via email or the development platform.
 
-Dengan dokumentasi yang lengkap dan jelas ini, diharapkan pengguna dapat dengan mudah memahami dan menggunakan proyek WebServerC. Selamat mencoba!
+---
+
+### **Happy Coding!** 🚀
+
