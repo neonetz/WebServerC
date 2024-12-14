@@ -3,7 +3,7 @@
 # File: test_request.sh
 # Deskripsi: Script untuk menguji batas ukuran permintaan dengan curl
 
-MAX_REQUEST_SIZE=3000  # Ukuran batas yang telah ditentukan
+MAX_REQUEST_SIZE=5000  # Ukuran batas yang telah ditentukan
 URL="http://localhost:8080/"  # Ubah dengan URL server yang sesuai
 
 # Membuat payload besar melebihi MAX_REQUEST_SIZE
