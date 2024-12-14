@@ -4,7 +4,7 @@
 # Deskripsi: Script untuk menguji buffer overflow pada port 8080 menggunakan nc (Netcat)
 
 # Host dan port target
-HOST="127.0.0.1"
+HOST="74.226.204.119"
 PORT=8080
 
 # Ukuran buffer yang dikirimkan
