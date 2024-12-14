@@ -140,6 +140,14 @@ else if (strcmp(method, "PUT") == 0) {
         {
             body += 4; // Melewati terminator header
 
+            // Cek apakah file ada sebelum memperbarui
+            if (access(file_path, F_OK) != 0)
+            {
+                // File tidak ditemukan
+                send_response(client_socket, "File not found.", 404);
+                return;
+            }
+
             // Buka file untuk ditulis ulang (mode append, jika ada isi akan ditimpa)
             FILE *file = fopen(file_path, "w");
             if (file)
