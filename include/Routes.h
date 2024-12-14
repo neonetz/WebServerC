@@ -19,6 +19,8 @@ struct Route *addRoute(struct Route *root, char* key, char* value);
 
 struct Route * search(struct Route * root, char * key);
 
+struct Route *deleteRoute(struct Route *root, char* key);
+
 
 void inorder(struct Route * root );
 

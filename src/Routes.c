@@ -60,3 +60,31 @@ struct Route *initialize_routes() {
     root = addRoute(root, "/about", "about.html");
     return root;
 }
+
+struct Route *deleteRoute(struct Route *root, char* key) {
+    if (root == NULL) return NULL;
+
+    if (strcmp(key, root->key) < 0) {
+        root->left = deleteRoute(root->left, key);
+    } else if (strcmp(key, root->key) > 0) {
+        root->right = deleteRoute(root->right, key);
+    } else {
+        if (root->left == NULL) {
+            struct Route *temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Route *temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        struct Route *temp = root->right;
+        while (temp && temp->left != NULL) temp = temp->left;
+
+        root->key = temp->key;
+        root->value = temp->value;
+        root->right = deleteRoute(root->right, temp->key);
+    }
+    return root;
+}

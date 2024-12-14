@@ -16,87 +16,89 @@ void handle_client(int client_socket, struct Route *route) {
         perror("Failed to read from client");
         close(client_socket);
         return;
-    } else if (bytes_read > MAX_CLIENT_MSG_SIZE) {
-        printf("Request terlalu besar, menolak permintaan.\n");
-        send(client_socket, "HTTP/1.1 413 Payload Too Large\r\n\r\n", 35, 0); // 413 status code
-        close(client_socket);
-    } else {
-        printf("%s\n", client_msg);
+    }else if (bytes_read > MAX_CLIENT_MSG_SIZE)
+    {
+            printf("Request terlalu besar, menolak permintaan.\n");
+            send(client_socket, "HTTP/1.1 413 Payload Too Large\r\n\r\n", 35, 0); // 413 status code
+            close(client_socket);
     }
-    
+
     client_msg[bytes_read] = '\0'; // Null-terminate the string
     printf("Received message: %s\n", client_msg);
 
-    // Cek apakah ini adalah permintaan HTTP
-    if (strncmp(client_msg, "GET", 3) == 0 || strncmp(client_msg, "POST", 4) == 0 ||
-        strncmp(client_msg, "PUT", 3) == 0 || strncmp(client_msg, "DELETE", 6) == 0 ||
-        strncmp(client_msg, "PATCH", 5) == 0) {
-        // Parsing client socket header to get HTTP method, route
-        char *method = "";
-        char *urlRoute = "";
+    // Parse HTTP method and route
+    char method[8], urlRoute[256];
+    sscanf(client_msg, "%s %s", method, urlRoute);
+    printf("Method: %s, Route: %s\n", method, urlRoute);
 
-        char *client_http_header = strtok(client_msg, "\n");
-        
-        printf("\n\n%s\n\n", client_http_header);
+    // Log the request
+    log_request(method, urlRoute);
 
-        char *header_token = strtok(client_http_header, " ");
-        
-        int header_parse_counter = 0;
-
-        while (header_token != NULL) {
-            switch (header_parse_counter) {
-                case 0:
-                    method = header_token;
-                    break;
-                case 1:
-                    urlRoute = header_token;
-                    break;
-            }
-            header_token = strtok(NULL, " ");
-            header_parse_counter++;
-        }
-
-        printf("The method is %s\n", method);
-        printf("The route is %s\n", urlRoute);
-
-        // Log the request
-        log_request(method, urlRoute);
-
-        char template[100] = "";
-        
-        if (strstr(urlRoute, "/static/") != NULL) {
-            strcat(template, "static/index.css");
+    if (strcmp(method, "GET") == 0) {
+        // Handle GET request
+        char template[100] = "templates/";
+        struct Route *destination = search(route, urlRoute);
+        if (destination == NULL) {
+            strcat(template, "404.html");
         } else {
-            struct Route * destination = search(route, urlRoute);
-            strcat(template, "templates/");
-
-            if (destination == NULL) {
-                strcat(template, "404.html");
+            strcat(template, destination->value);
+        }
+        char *response_data = render_static_file(template);
+        send_response(client_socket, response_data ? response_data : "404 Not Found", 200);
+    } else if (strcmp(method, "POST") == 0) {
+        // Handle POST request (echo body)
+        char *body = strstr(client_msg, "\r\n\r\n");
+        if (body) {
+            body += 4; // Skip header terminator
+            printf("POST Body: %s\n", body);
+            send_response(client_socket, body, 200);
+        } else {
+            send_response(client_socket, "No Body Found", 400);
+        }
+    } else if (strcmp(method, "PUT") == 0) {
+        // Handle PUT request (add route)
+        char *body = strstr(client_msg, "\r\n\r\n");
+        if (body) {
+            body += 4;
+            route = addRoute(route, urlRoute, body);
+            send_response(client_socket, "Route added successfully.", 200);
+        } else {
+            send_response(client_socket, "No data to add route.", 400);
+        }
+    } else if (strcmp(method, "DELETE") == 0) {
+        // Handle DELETE request
+        struct Route *deleted = deleteRoute(route, urlRoute);
+        if (deleted) {
+            send_response(client_socket, "Route deleted successfully.", 200);
+        } else {
+            send_response(client_socket, "Route not found.", 404);
+        }
+    } else if (strcmp(method, "PATCH") == 0) {
+        // Handle PATCH request (update route)
+        char *body = strstr(client_msg, "\r\n\r\n");
+        if (body) {
+            body += 4;
+            struct Route *existing = search(route, urlRoute);
+            if (existing) {
+                existing->value = body; // Replace value
+                send_response(client_socket, "Route updated successfully.", 200);
             } else {
-                strcat(template, destination->value);
+                send_response(client_socket, "Route not found.", 404);
             }
-        }
-
-        char * response_data = render_static_file(template);
-
-        char http_header[4096] = "HTTP/1.1 200 OK\r\n\r\n";
-
-        if (response_data != NULL) {
-            strcat(http_header, response_data);
         } else {
-            strcat(http_header, "404 Not Found");
+            send_response(client_socket, "No data to update route.", 400);
         }
-        
-        strcat(http_header, "\r\n\r\n");
-
-        send(client_socket, http_header, strlen(http_header), 0);
     } else {
-        // Jika bukan permintaan HTTP, anggap sebagai pesan echo
-        ssize_t bytes_sent = send(client_socket, client_msg, bytes_read, 0);
-        if (bytes_sent < 0) {
-            perror("Failed to send message to client");
-        }
+        // Unknown method
+        send_response(client_socket, "Method Not Allowed", 405);
     }
 
     close(client_socket);
+}
+
+void send_response(int client_socket, const char *body, int status_code) {
+    char response[MAX_CLIENT_MSG_SIZE];
+    snprintf(response, MAX_CLIENT_MSG_SIZE, "HTTP/1.1 %d OK\r\nContent-Length: %zu\r\n\r\n%s", 
+             status_code, strlen(body), body);
+    send(client_socket, response, strlen(response), 0);
 }
