@@ -183,3 +183,4 @@ New client connected.
 [2024-12-14 17:04:27] Method: GET, URL: /
 [2024-12-14 17:04:27] Method: GET, URL: /static/index.css
 [2024-12-14 17:04:27] Method: GET, URL: /favicon.ico
+[2024-12-14 17:49:49] Method: POST, URL: /

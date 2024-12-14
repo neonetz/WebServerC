@@ -8,7 +8,17 @@
 
 #define MAX_CLIENT_MSG_SIZE 4096
 
-// Fungsi untuk menghapus file
+/**
+ * @brief Deletes a file at the specified file path.
+ *
+ * This function attempts to delete the file located at the given file path.
+ * If the file is successfully deleted, the function returns 1. If the file
+ * deletion fails, an error message is printed to stderr and the function
+ * returns 0.
+ *
+ * @param filePath The path to the file to be deleted.
+ * @return int 1 if the file was successfully deleted, 0 otherwise.
+ */
 int deleteFile(const char *filePath)
 {
     if (unlink(filePath) == 0)
@@ -43,6 +53,7 @@ void handle_client(int client_socket, struct Route *route) {
     }
 
     client_msg[bytes_read] = '\0'; // Null-terminate the string
+    // ...remaining code...
     // Parse HTTP method and route
     char method[8], urlRoute[256];
     sscanf(client_msg, "%s %s", method, urlRoute);

