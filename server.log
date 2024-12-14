@@ -171,3 +171,12 @@ Client request handled.
 New client connected.
 Client request handled.
 New client connected.
+[2024-12-14 16:55:16] Method: PATCH, URL: /newroute
+[2024-12-14 16:50:49] Method: DELETE, URL: /newroute
+[2024-12-14 16:50:56] Method: DELETE, URL: /newroute
+[2024-12-14 16:56:06] Method: DELETE, URL: /newroute
+[2024-12-14 16:51:15] Method: PUT, URL: /newroute
+[2024-12-14 17:01:50] Method: GET, URL: /
+[2024-12-14 17:01:51] Method: GET, URL: /static/index.css
+[2024-12-14 17:01:52] Method: GET, URL: /favicon.ico
+[2024-12-14 17:01:55] Method: ) , URL: @ð 
