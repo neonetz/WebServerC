@@ -24,12 +24,12 @@ void handle_client(int client_socket, struct Route *route) {
     }
 
     client_msg[bytes_read] = '\0'; // Null-terminate the string
-    printf("Received message: %s\n", client_msg);
+    // printf("Received message: %s\n", client_msg);
 
     // Parse HTTP method and route
     char method[8], urlRoute[256];
     sscanf(client_msg, "%s %s", method, urlRoute);
-    printf("Method: %s, Route: %s\n", method, urlRoute);
+    printf("Method: %s\n Route: %s\n", method, urlRoute);
 
     // Log the request
     log_request(method, urlRoute);
@@ -38,11 +38,13 @@ void handle_client(int client_socket, struct Route *route) {
         // Handle GET request
         char template[100] = "templates/";
         struct Route *destination = search(route, urlRoute);
+        
         if (destination == NULL) {
             strcat(template, "404.html");
         } else {
             strcat(template, destination->value);
         }
+        
         char *response_data = render_static_file(template);
         send_response(client_socket, response_data ? response_data : "404 Not Found", 200);
     } else if (strcmp(method, "POST") == 0) {
