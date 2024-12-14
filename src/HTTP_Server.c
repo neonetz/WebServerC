@@ -1,8 +1,18 @@
+
 #include "HTTP_Server.h"
 #include <netinet/in.h>
 #include <stdio.h>
 #include <sys/socket.h>
 
+/**
+ * @brief Initializes the HTTP server.
+ *
+ * This function sets up the HTTP server by creating a socket, binding it to the specified port,
+ * and setting it to listen for incoming connections.
+ *
+ * @param http_server A pointer to the HTTP_Server structure to initialize.
+ * @param port The port number on which the server will listen for incoming connections.
+ */
 void init_server(HTTP_Server * http_server, int port) {
 	http_server->port = port;
 

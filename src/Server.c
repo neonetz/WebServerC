@@ -10,6 +10,34 @@
 #include <sys/wait.h>
 #include <netinet/in.h>
 
+/**
+ * @brief Starts the HTTP server on the specified port.
+ *
+ * This function initializes the server, sets up the routes, and listens for incoming client connections.
+ * For each client connection, it forks a new process to handle the client request.
+ *
+ * @param port The port number on which the server will listen for incoming connections.
+ *
+ * The function performs the following steps:
+ * 1. Initializes the routes using `initialize_routes()`.
+ * 2. Initializes the server and socket using `init_server()`.
+ * 3. Enters an infinite loop to listen for incoming client connections.
+ * 4. For each client connection:
+ *    - Accepts the connection.
+ *    - Forks a new process to handle the client request.
+ *    - In the child process:
+ *      - Closes the server socket.
+ *      - Handles the client request using `handle_client()`.
+ *      - Exits the child process after handling the client.
+ *    - In the parent process:
+ *      - Waits for the child process to terminate.
+ *      - Closes the client socket.
+ * 5. Closes the server socket when the server is stopped.
+ *
+ * Error handling:
+ * - If accepting a connection fails, an error message is printed and the server continues to listen for new connections.
+ * - If forking a new process fails, an error message is printed, the client socket is closed, and the server continues to listen for new connections.
+ */
 void start_server(int port) {
     // Inisialisasi route
     struct Route *route = initialize_routes();

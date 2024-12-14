@@ -3,6 +3,17 @@
 #include <string.h>
 #include <stdlib.h>
 
+/**
+ * Renders the content of a static file.
+ *
+ * This function opens a file specified by the given file name, reads its content,
+ * and returns it as a dynamically allocated string. If the file does not exist,
+ * the function returns NULL.
+ *
+ * @param fileName The name of the file to be read.
+ * @return A pointer to a dynamically allocated string containing the file content,
+ *         or NULL if the file does not exist.
+ */
 char * render_static_file(char * fileName) {
 	FILE* file = fopen(fileName, "r");
 

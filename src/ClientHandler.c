@@ -41,8 +41,8 @@ void handle_client(int client_socket, struct Route *route) {
             return; // Stop further processing
         }
     }
-    client_msg[bytes_read] = '\0'; // Null-terminate the string
 
+    client_msg[bytes_read] = '\0'; // Null-terminate the string
     // Parse HTTP method and route
     char method[8], urlRoute[256];
     sscanf(client_msg, "%s %s", method, urlRoute);
