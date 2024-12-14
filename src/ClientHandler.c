@@ -16,22 +16,21 @@ void handle_client(int client_socket, struct Route *route) {
         perror("Failed to read from client");
         close(client_socket);
         return;
-    }else if (bytes_read > MAX_CLIENT_MSG_SIZE)
-    {
-            printf("Request terlalu besar, menolak permintaan.\n");
-            send(client_socket, "HTTP/1.1 413 Payload Too Large\r\n\r\n", 35, 0); // 413 status code
-            close(client_socket);
-    }else
-        {
-            printf("%s\n", client_msg);
-        }
-    
+    } else if (bytes_read > MAX_CLIENT_MSG_SIZE) {
+        printf("Request terlalu besar, menolak permintaan.\n");
+        send(client_socket, "HTTP/1.1 413 Payload Too Large\r\n\r\n", 35, 0); // 413 status code
+        close(client_socket);
+    } else {
+        printf("%s\n", client_msg);
+    }
     
     client_msg[bytes_read] = '\0'; // Null-terminate the string
     printf("Received message: %s\n", client_msg);
 
     // Cek apakah ini adalah permintaan HTTP
-    if (strncmp(client_msg, "GET", 3) == 0 || strncmp(client_msg, "POST", 4) == 0) {
+    if (strncmp(client_msg, "GET", 3) == 0 || strncmp(client_msg, "POST", 4) == 0 ||
+        strncmp(client_msg, "PUT", 3) == 0 || strncmp(client_msg, "DELETE", 6) == 0 ||
+        strncmp(client_msg, "PATCH", 5) == 0) {
         // Parsing client socket header to get HTTP method, route
         char *method = "";
         char *urlRoute = "";
