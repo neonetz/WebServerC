@@ -180,3 +180,6 @@ New client connected.
 [2024-12-14 17:01:51] Method: GET, URL: /static/index.css
 [2024-12-14 17:01:52] Method: GET, URL: /favicon.ico
 [2024-12-14 17:01:55] Method: ) , URL: @ð 
+[2024-12-14 17:04:27] Method: GET, URL: /
+[2024-12-14 17:04:27] Method: GET, URL: /static/index.css
+[2024-12-14 17:04:27] Method: GET, URL: /favicon.ico
