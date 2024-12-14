@@ -8,6 +8,20 @@
 
 #define MAX_CLIENT_MSG_SIZE 4096
 
+// Fungsi untuk menghapus file
+int deleteFile(const char *filePath)
+{
+    if (unlink(filePath) == 0)
+    {
+        return 1; // File berhasil dihapus
+    }
+    else
+    {
+        perror("Gagal menghapus file");
+        return 0; // File gagal dihapus
+    }
+}
+
 void handle_client(int client_socket, struct Route *route) {
     char client_msg[MAX_CLIENT_MSG_SIZE] = "";
     ssize_t bytes_read = read(client_socket, client_msg, MAX_CLIENT_MSG_SIZE - 1);
@@ -93,6 +107,19 @@ else if (strcmp(method, "PUT") == 0) {
     }
     } else if (strcmp(method, "DELETE") == 0) {
         // Handle DELETE request
+        char file_path[256] = "templates/";
+        strcat(file_path, urlRoute); // Menambahkan nama file ke path
+
+        // Cek jika file ada, lalu hapus
+        if (deleteFile(file_path))
+        {
+            send_response(client_socket, "File deleted successfully.", 200);
+        }
+        else
+        {
+            send_response(client_socket, "File not found or cannot be deleted.", 404);
+        }
+
         struct Route *deleted = deleteRoute(route, urlRoute);
         if (deleted) {
             send_response(client_socket, "Route deleted successfully.", 200);
@@ -100,21 +127,34 @@ else if (strcmp(method, "PUT") == 0) {
             send_response(client_socket, "Route not found.", 404);
         }
     } else if (strcmp(method, "PATCH") == 0) {
-    // Handle PATCH request (update route)
-    char *body = strstr(client_msg, "\r\n\r\n");
-    if (body) {
-        body += 4; // Skip header terminator
-        struct Route *existing = search(route, urlRoute);
-        if (existing) {
-            // Update the route value with the new content
-            existing->value = body; // Replace value with new content
-            send_response(client_socket, "Route updated successfully.", 200);
-        } else {
-            send_response(client_socket, "Route not found.", 404);
+        // Handle PATCH request (update file content)
+        char file_path[256] = "templates/";
+        strcat(file_path, urlRoute); // Gabungkan dengan path dari URL
+
+        // Cari body dari request HTTP
+        char *body = strstr(client_msg, "\r\n\r\n");
+        if (body)
+        {
+            body += 4; // Melewati terminator header
+
+            // Buka file untuk ditulis ulang (mode append, jika ada isi akan ditimpa)
+            FILE *file = fopen(file_path, "w");
+            if (file)
+            {
+                fprintf(file, "%s", body); // Tulis konten baru ke file
+                fclose(file);
+                send_response(client_socket, "File updated successfully.", 200);
+            }
+            else
+            {
+                perror("Error opening file");
+                send_response(client_socket, "File not found or cannot be updated.", 404);
+            }
         }
-    } else {
-        send_response(client_socket, "No data to update route.", 400);
-    }
+        else
+        {
+            send_response(client_socket, "Invalid PATCH request body.", 400);
+        }
 } else {
         // Unknown method
         send_response(client_socket, "Method Not Allowed", 405);
