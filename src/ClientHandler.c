@@ -120,62 +120,85 @@ else if (strcmp(method, "PUT") == 0) {
         send_response(client_socket, "No data to add route.", 400);
     }
     } else if (strcmp(method, "DELETE") == 0) {
-        // Handle DELETE request
+        // Handle DELETE request (remove route and file)
+
+        // Menyusun path file berdasarkan urlRoute
         char file_path[256] = "templates/";
-        strcat(file_path, urlRoute); // Menambahkan nama file ke path
+        strcat(file_path, urlRoute + 1); // Menambahkan URL route tanpa tanda "/"
 
-        // Cek jika file ada, lalu hapus
-        if (deleteFile(file_path))
+        // Jika file tidak memiliki ekstensi, tambahkan .html secara default
+        if (strrchr(file_path, '.') == NULL)
         {
-            send_response(client_socket, "File deleted successfully.", 200);
-        }
-        else
-        {
-            send_response(client_socket, "File not found or cannot be deleted.", 404);
+            strcat(file_path, ".html");
         }
 
-        struct Route *deleted = deleteRoute(route, urlRoute);
-        if (deleted) {
-            send_response(client_socket, "Route deleted successfully.", 200);
-        } else {
-            send_response(client_socket, "Route not found.", 404);
-        }
-    } else if (strcmp(method, "PATCH") == 0) {
-        // Handle PATCH request (update file content)
-        char file_path[256] = "templates/";
-        strcat(file_path, urlRoute); // Gabungkan dengan path dari URL
-
-        // Cari body dari request HTTP
-        char *body = strstr(client_msg, "\r\n\r\n");
-        if (body)
-        {
-            body += 4; // Melewati terminator header
-
-            // Cek apakah file ada sebelum memperbarui
-            if (access(file_path, F_OK) != 0)
+        // Periksa apakah file ada sebelum menghapus
+        if (access(file_path, F_OK) == 0)
+        { // F_OK untuk memeriksa keberadaan file
+            // Menghapus file
+            if (remove(file_path) == 0)
             {
-                // File tidak ditemukan
-                send_response(client_socket, "File not found.", 404);
-                return;
-            }
+                // Menghapus rute dari pohon (jika rute disimpan dalam struktur data)
+                route = deleteRoute(route, urlRoute); // Hapus rute dari struktur data (opsional)
 
-            // Buka file untuk ditulis ulang (mode append, jika ada isi akan ditimpa)
-            FILE *file = fopen(file_path, "w");
-            if (file)
-            {
-                fprintf(file, "%s", body); // Tulis konten baru ke file
-                fclose(file);
-                send_response(client_socket, "File updated successfully.", 200);
+                send_response(client_socket, "Route and file deleted successfully.", 200);
             }
             else
             {
-                perror("Error opening file");
-                send_response(client_socket, "File not found or cannot be updated.", 404);
+                // Gagal menghapus file
+                send_response(client_socket, "Error deleting file.", 500);
             }
         }
         else
         {
-            send_response(client_socket, "Invalid PATCH request body.", 400);
+            // File tidak ditemukan
+            send_response(client_socket, "File not found.", 404);
+        }
+    } else if (strcmp(method, "PATCH") == 0) {
+        // Handle PATCH request (update file content)
+        char *body = strstr(client_msg, "\r\n\r\n");
+        if (body)
+        {
+            body += 4; // Skip header terminator
+
+            // Menyusun path file berdasarkan urlRoute
+            char file_path[256] = "templates/";
+            strcat(file_path, urlRoute + 1); // Menambahkan URL route tanpa tanda "/"
+
+            // Jika file tidak memiliki ekstensi, tambahkan .html secara default
+            if (strrchr(file_path, '.') == NULL)
+            {
+                strcat(file_path, ".html");
+            }
+
+            // Periksa apakah file ada
+            if (access(file_path, F_OK) == 0)
+            { // F_OK untuk memeriksa keberadaan file
+                // Membuka file untuk memperbarui konten (mode "w" menimpa konten lama)
+                FILE *file = fopen(file_path, "w");
+                if (file)
+                {
+                    // Menulis body dari request ke file
+                    fwrite(body, sizeof(char), strlen(body), file);
+                    fclose(file); // Menutup file setelah selesai
+
+                    send_response(client_socket, "File updated successfully.", 200);
+                }
+                else
+                {
+                    // Error saat membuka file
+                    send_response(client_socket, "Error updating file.", 500);
+                }
+            }
+            else
+            {
+                // File tidak ditemukan
+                send_response(client_socket, "File not found.", 404);
+            }
+        }
+        else
+        {
+            send_response(client_socket, "No data to update file.", 400);
         }
 } else {
         // Unknown method
