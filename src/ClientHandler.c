@@ -32,6 +32,35 @@ int deleteFile(const char *filePath)
     }
 }
 
+/**
+ * @file ClientHandler.c
+ * @brief Handles client requests for the web server.
+ *
+ * This file contains the implementation of the function that handles client requests,
+ * including GET, POST, PUT, DELETE, and PATCH methods.
+ */
+
+ /**
+ * @brief Handles a client request.
+ *
+ * This function reads the client's request, parses the HTTP method and route,
+ * and processes the request based on the method. It supports GET, POST, PUT,
+ * DELETE, and PATCH methods.
+ *
+ * @param client_socket The socket descriptor for the client connection.
+ * @param route The root of the route tree for handling dynamic routes.
+ *
+ * - For GET requests, it serves static files based on the route.
+ * - For POST requests, it echoes the body of the request.
+ * - For PUT requests, it adds a new route and creates a corresponding file.
+ * - For DELETE requests, it removes a route and deletes the corresponding file.
+ * - For PATCH requests, it updates the content of an existing file.
+ *
+ * If the request is too large, it responds with a 413 Payload Too Large status.
+ * If the method is not recognized, it responds with a 405 Method Not Allowed status.
+ *
+ * @note The function closes the client socket before returning.
+ */
 void handle_client(int client_socket, struct Route *route) {
     char client_msg[MAX_CLIENT_MSG_SIZE] = "";
     ssize_t bytes_read = read(client_socket, client_msg, MAX_CLIENT_MSG_SIZE - 1);
@@ -208,6 +237,16 @@ else if (strcmp(method, "PUT") == 0) {
     close(client_socket);
 }
 
+/**
+ * @brief Sends an HTTP response to the client.
+ *
+ * This function constructs an HTTP response with the given status code and body,
+ * and sends it to the specified client socket.
+ *
+ * @param client_socket The socket descriptor of the client to which the response will be sent.
+ * @param body The body of the HTTP response.
+ * @param status_code The HTTP status code to be included in the response.
+ */
 void send_response(int client_socket, const char *body, int status_code) {
     char response[MAX_CLIENT_MSG_SIZE];
     snprintf(response, MAX_CLIENT_MSG_SIZE, "HTTP/1.1 %d OK\r\nContent-Length: %zu\r\n\r\n%s", 
