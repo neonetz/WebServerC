@@ -1,7 +1,9 @@
 #include "Logger.h"
+#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#define MAX_LINES 10
 
 /**
  * @brief Logs an HTTP request to a log file.
@@ -14,7 +16,9 @@
  */
 void log_request(const char *method, const char *url)
 {
-    FILE *log_file = fopen("server.log", "a");
+    const char *filename = "server.log";
+    maintain_log_size(filename);
+    FILE *log_file = fopen(filename, "a");
     if (log_file != NULL)
     {
         time_t now = time(NULL);
@@ -42,7 +46,9 @@ void log_request(const char *method, const char *url)
  * @param pid The process ID to log.
  */
 void log_fork(const char * message, int pid){
-    FILE *log_file = fopen("serverFork.log", "a");
+    const char *filename = "serverFork.log";
+    maintain_log_size(filename);
+    FILE *log_file = fopen(filename, "a");
     if (log_file != NULL)
     {
         time_t now = time(NULL);
@@ -56,5 +62,46 @@ void log_fork(const char * message, int pid){
     else
     {
         perror("Failed to open log file");
+    }
+}
+
+void maintain_log_size(const char *filename)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        return; // Jika file belum ada, langsung keluar
+    }
+
+    // Membaca semua baris ke dalam buffer
+    char *lines[MAX_LINES] = {0};
+    int count = 0;
+
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), file) != NULL)
+    {
+        if (count < MAX_LINES)
+        {
+            lines[count++] = strdup(buffer); // Simpan baris di array
+        }
+        else
+        {
+            free(lines[0]);                                              // Hapus baris pertama
+            memmove(lines, lines + 1, (MAX_LINES - 1) * sizeof(char *)); // Geser semua baris
+            lines[MAX_LINES - 1] = strdup(buffer);                       // Tambahkan baris baru
+        }
+    }
+    fclose(file);
+
+    // Tulis ulang file dengan hanya MAX_LINES baris
+    file = fopen(filename, "w");
+    if (file != NULL)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            fputs(lines[i], file);
+            free(lines[i]); // Bebaskan memori
+        }
+        fclose(file);
     }
 }
